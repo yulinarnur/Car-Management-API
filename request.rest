@@ -1,0 +1,78 @@
+//Create User
+POST http://localhost:5000/users
+Content-Type: application/json
+
+{
+    "name": "Rahmawati",
+    "email": "member@gmail.com",
+    "password": "123456",
+    "confPassword": "123456",
+    "role": "member"
+}
+
+###
+// get All users
+GET http://localhost:5000/users
+
+###
+# get Single user
+GET http://localhost:5000/users/b3aebe00-f3af-477a-8036-161a1aff7f53
+
+###
+// update user
+PATCH http://localhost:5000/users/b3aebe00-f3af-477a-8036-161a1aff7f53
+Content-Type: application/json
+
+{
+    "name": "Yulinar Nur Rahmawati",
+    "email": "superadmin@gmail.com",
+    "password": "",
+    "confPassword": "",
+    "role": "superadmin"
+}
+
+###
+# Delete user
+DELETE http://localhost:5000/users/25a49d20-2b63-4935-86ed-75ce198f313d
+
+###
+//Login Super Admin
+POST http://localhost:5000/login
+Content-Type: application/json
+
+{
+    "email": "superadmin@gmail.com",
+    "password": "123456"
+}
+
+###
+//Login Admin
+POST http://localhost:5000/login
+Content-Type: application/json
+
+{
+    "email": "admin@gmail.com",
+    "password": "123456"
+}
+
+###
+//Login Member
+POST http://localhost:5000/login
+Content-Type: application/json
+
+{
+    "email": "member@gmail.com",
+    "password": "123456"
+}
+
+###
+GET http://localhost:5000/me
+
+###
+// Logout user
+DELETE http://localhost:5000/logout
+
+
+###
+// get all car
+GET http://localhost:5000/cars
