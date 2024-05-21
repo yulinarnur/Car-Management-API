@@ -63,13 +63,19 @@ export const Me = async (req, res) => {
 export const logOut = async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
   if (!refreshToken) return res.sendStatus(204);
-  const user = await Users.findAll({
+
+  const users = await Users.findAll({
     where: {
       refresh_token: refreshToken,
     },
   });
-  if (!user) return res.sendStatus(204);
-  const userId = user.id;
+
+  // Cek apakah user ditemukan
+  if (users.length === 0) return res.sendStatus(204);
+
+  const userId = users[0].id;
+  console.log(users);
+
   await Users.update(
     { refresh_token: null },
     {
@@ -78,6 +84,7 @@ export const logOut = async (req, res) => {
       },
     }
   );
+
   res.clearCookie("refreshToken");
   return res.sendStatus(200);
   // req.session.destroy((err) => {

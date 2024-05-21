@@ -38,3 +38,17 @@ export const adminOnly = async (req, res, next) => {
     return res.status(403).json({ msg: "Akses Terlarang " });
   next();
 };
+
+export const superAdminAndAdmin = async (req, res, next) => {
+  const user = await Users.findOne({
+    where: {
+      uuid: req.session.userId,
+    },
+  });
+  if (!user) return res.status(404).json({ msg: "User tidak ditemukan" });
+  if (user.role === "member")
+    return res
+      .status(403)
+      .json({ msg: "Akses hanya untuk Super Admin & Admin nano nano bet" });
+  next();
+};

@@ -11,13 +11,20 @@ import {
   adminOnly,
   superAdminOnly,
 } from "../middleware/AuthUser.js";
+import { verifyToken } from "../middleware/VerifyToken.js";
 
 const router = express.Router();
 
-router.get("/users", verifyUser, superAdminOnly, getUsers);
-router.get("/users/:id", verifyUser, superAdminOnly, getUserById);
-router.post("/users", verifyUser, superAdminOnly, createUser);
-router.patch("/users/:id", verifyUser, superAdminOnly, updateUser);
-router.delete("/users/:id", verifyUser, superAdminOnly, deleteUser);
+router.get("/users", verifyUser, verifyToken, superAdminOnly, getUsers);
+router.get("/users/:id", verifyUser, verifyToken, superAdminOnly, getUserById);
+router.post("/users", createUser);
+router.patch("/users/:id", verifyUser, verifyToken, superAdminOnly, updateUser);
+router.delete(
+  "/users/:id",
+  verifyUser,
+  verifyToken,
+  superAdminOnly,
+  deleteUser
+);
 
 export default router;

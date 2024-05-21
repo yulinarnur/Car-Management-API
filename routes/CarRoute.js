@@ -7,7 +7,7 @@ import {
   updateCar,
   deleteCar,
 } from "../controllers/Cars.js";
-import { verifyUser } from "../middleware/AuthUser.js";
+import { verifyUser, superAdminAndAdmin } from "../middleware/AuthUser.js";
 import { verifyToken } from "../middleware/VerifyToken.js";
 
 const router = express.Router();
@@ -27,6 +27,7 @@ router.post(
   "/cars",
   verifyToken,
   verifyUser,
+  superAdminAndAdmin,
   upload.single("images"),
   createCar
 );
@@ -34,9 +35,16 @@ router.patch(
   "/cars/:id",
   verifyToken,
   verifyUser,
+  superAdminAndAdmin,
   upload.single("images"),
   updateCar
 );
-router.delete("/cars/:id", verifyToken, verifyUser, deleteCar);
+router.delete(
+  "/cars/:id",
+  verifyToken,
+  verifyUser,
+  superAdminAndAdmin,
+  deleteCar
+);
 
 export default router;
