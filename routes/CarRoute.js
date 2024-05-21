@@ -8,6 +8,7 @@ import {
   deleteCar,
 } from "../controllers/Cars.js";
 import { verifyUser } from "../middleware/AuthUser.js";
+import { verifyToken } from "../middleware/VerifyToken.js";
 
 const router = express.Router();
 const storage = multer.diskStorage({
@@ -20,10 +21,22 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-router.get("/cars", verifyUser, getCars);
-router.get("/cars/:id", verifyUser, getCarById);
-router.post("/cars", verifyUser, upload.single("images"), createCar);
-router.patch("/cars/:id", verifyUser, upload.single("images"), updateCar);
-router.delete("/cars/:id", verifyUser, deleteCar);
+router.get("/cars", verifyToken, verifyUser, getCars);
+router.get("/cars/:id", verifyToken, verifyUser, getCarById);
+router.post(
+  "/cars",
+  verifyToken,
+  verifyUser,
+  upload.single("images"),
+  createCar
+);
+router.patch(
+  "/cars/:id",
+  verifyToken,
+  verifyUser,
+  upload.single("images"),
+  updateCar
+);
+router.delete("/cars/:id", verifyToken, verifyUser, deleteCar);
 
 export default router;
