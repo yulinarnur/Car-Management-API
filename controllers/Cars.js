@@ -20,12 +20,19 @@ export const getCars = async (req, res) => {
   try {
     let response;
     response = await Cars.findAll({
+      where: {
+        is_deleted: 0,
+      },
       attributes: [
         "id",
         "uuid",
         "model",
         "rentPerDay",
         "images",
+        "is_deleted",
+        "createdBy",
+        "updatedBy",
+        "deletedBy",
         "createdAt",
         "updatedAt",
       ],
@@ -56,6 +63,7 @@ export const getCarById = async (req, res) => {
     const car = await Cars.findOne({
       where: {
         uuid: req.params.id,
+        is_deleted: 0,
       },
     });
 
