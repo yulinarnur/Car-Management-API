@@ -95,6 +95,7 @@ export const createCar = async (req, res) => {
       rentPerDay: rentPerDay,
       images: imageName,
       userId: req.userId,
+      createdBy: req.userId,
     });
     res.status(201).json({ msg: "Car Created Successfuly" });
   } catch (error) {
@@ -122,7 +123,7 @@ export const updateCar = async (req, res) => {
     }
     if (req.role !== "member") {
       await Cars.update(
-        { model, rentPerDay, images: car.images },
+        { model, rentPerDay, images: car.images, updatedBy: req.userId },
         {
           where: {
             id: car.id,
@@ -158,12 +159,12 @@ export const deleteCar = async (req, res) => {
     }
 
     // Hapus gambar mobil
-    const imageName = path.basename(car.images);
-    const imgPath = path.join(__dirname, "../public/uploads", imageName);
-    console.log("halaman path", imgPath);
-    if (fs.existsSync(imgPath)) {
-      fs.unlinkSync(imgPath);
-    }
+    // const imageName = path.basename(car.images);
+    // const imgPath = path.join(__dirname, "../public/uploads", imageName);
+    // console.log("halaman path", imgPath);
+    // if (fs.existsSync(imgPath)) {
+    //   fs.unlinkSync(imgPath);
+    // }
 
     await Cars.update(
       {
