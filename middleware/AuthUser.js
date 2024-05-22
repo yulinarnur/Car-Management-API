@@ -49,6 +49,6 @@ export const superAdminAndAdmin = async (req, res, next) => {
   if (user.role === "member")
     return res
       .status(403)
-      .json({ msg: "Akses hanya untuk Super Admin & Admin nano nano bet" });
+      .json({ msg: "Akses hanya untuk Super Admin & Admin" });
   next();
 };

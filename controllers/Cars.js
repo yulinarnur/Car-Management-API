@@ -143,28 +143,33 @@ export const deleteCar = async (req, res) => {
 
     if (!car) return res.status(404).json({ msg: "Data tidak ditemukan" });
 
+    if (req.role !== "superadmin" && req.role !== "admin") {
+      return res
+        .status(403)
+        .json({ msg: "Akses hanya untuk Superadmin & Admin" });
+    }
+
+    // Hapus gambar mobil
     const imageName = path.basename(car.images);
-    // url gambar
     const imgPath = path.join(__dirname, "../public/uploads", imageName);
     console.log("halaman path", imgPath);
-    //  hapus gambar nya
     if (fs.existsSync(imgPath)) {
       fs.unlinkSync(imgPath);
     }
 
-    if (req.role !== "member") {
-      await Cars.destroy({
+    await Cars.update(
+      {
+        is_deleted: 1,
+        deletedBy: req.userId,
+      },
+      {
         where: {
           id: car.id,
         },
-      });
-    } else {
-      if (req.role === "member")
-        return res
-          .status(403)
-          .json({ msg: "Akses hanya untuk Superadmin & Admin" });
-    }
-    res.status(200).json({ msg: "Car deleted successfuly" });
+      }
+    );
+
+    res.status(200).json({ msg: "Car deleted successfully" });
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }

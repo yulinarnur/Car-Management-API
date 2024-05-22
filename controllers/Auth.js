@@ -74,7 +74,7 @@ export const logOut = async (req, res) => {
   if (users.length === 0) return res.sendStatus(204);
 
   const userId = users[0].id;
-  console.log(users);
+  // console.log(users);
 
   await Users.update(
     { refresh_token: null },

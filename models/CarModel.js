@@ -44,6 +44,18 @@ const Cars = db.define(
         notEmpty: true,
       },
     },
+    is_deleted: {
+      type: DataTypes.INTEGER,
+    },
+    createdBy: {
+      type: DataTypes.INTEGER,
+    },
+    updatedBy: {
+      type: DataTypes.INTEGER,
+    },
+    deletedBy: {
+      type: DataTypes.INTEGER,
+    },
   },
   {
     freezeTableName: true,

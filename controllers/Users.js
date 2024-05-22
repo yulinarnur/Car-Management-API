@@ -33,16 +33,36 @@ export const createUser = async (req, res) => {
       .status(400)
       .json({ msg: "Password dan Confirm Password tidak cocok" });
   const hashPassword = await argon2.hash(password);
-  try {
-    await Users.create({
-      name: name,
-      email: email,
-      password: hashPassword,
-      role: role,
-    });
-    res.status(201).json({ msg: "Register Berhasil" });
-  } catch (error) {
-    res.status(400).json({ msg: error.message });
+  if (role === "admin") {
+    if (req.role === "superadmin") {
+      try {
+        await Users.create({
+          name: name,
+          email: email,
+          password: hashPassword,
+          role: role,
+        });
+        res.status(201).json({ msg: "Register Berhasil" });
+      } catch (error) {
+        res.status(400).json({ msg: error.message });
+      }
+    } else {
+      res.status(400).json({ msg: "Anda tidak memiliki akses" });
+    }
+  } else if (role === "superadmin") {
+    res.status(400).json({ msg: "Anda tidak memiliki akses" });
+  } else {
+    try {
+      await Users.create({
+        name: name,
+        email: email,
+        password: hashPassword,
+        role: role,
+      });
+      res.status(201).json({ msg: "Register Berhasil" });
+    } catch (error) {
+      res.status(400).json({ msg: error.message });
+    }
   }
 };
 
