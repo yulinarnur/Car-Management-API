@@ -21,10 +21,10 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-router.get("/cars", verifyToken, verifyUser, getCars);
-router.get("/cars/:id", verifyToken, verifyUser, getCarById);
+router.get("/cars/getAll", verifyToken, verifyUser, getCars);
+router.get("/cars/getById/:id", verifyToken, verifyUser, getCarById);
 router.post(
-  "/cars",
+  "/cars/add",
   verifyToken,
   verifyUser,
   superAdminAndAdmin,
@@ -32,7 +32,7 @@ router.post(
   createCar
 );
 router.patch(
-  "/cars/:id",
+  "/cars/edit/:id",
   verifyToken,
   verifyUser,
   superAdminAndAdmin,
@@ -40,7 +40,7 @@ router.patch(
   updateCar
 );
 router.delete(
-  "/cars/:id",
+  "/cars/delete/:id",
   verifyToken,
   verifyUser,
   superAdminAndAdmin,
