@@ -135,3 +135,42 @@ export const deleteUser = async (req, res) => {
     res.status(400).json({ msg: error.message });
   }
 };
+export const createUserNonMember = async (req, res) => {
+  const { name, email, password, confPassword, role } = req.body;
+
+  if (password !== confPassword) {
+    return res
+      .status(400)
+      .json({ msg: "Password dan Confirm Password tidak cocok" });
+  }
+
+  const saltRounds = 10;
+  const hashPassword = await bcrypt.hash(password, saltRounds);
+
+  try {
+    let existingUser = await Users.findOne({
+      where: {
+        email: email,
+      },
+    });
+
+    if (existingUser) {
+      return res.status(400).json({ msg: "Email sudah terdaftar" });
+    }
+    if (role === "member" || role === undefined) {
+      const newUser = await Users.create({
+        name: name,
+        email: email,
+        password: hashPassword,
+        role: "member",
+      });
+      return res.status(201).json({ msg: "Register Berhasil" });
+    } else {
+      return res
+        .status(403)
+        .json({ msg: "Anda tidak memiliki akses untuk menambahkan admin" });
+    }
+  } catch (error) {
+    return res.status(400).json({ msg: error.message });
+  }
+};
