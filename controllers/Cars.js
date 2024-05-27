@@ -18,8 +18,7 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 export const getCars = async (req, res) => {
   try {
-    let response;
-    response = await Cars.findAll({
+    const cars = await Cars.findAll({
       where: {
         is_deleted: 0,
       },
@@ -39,10 +38,62 @@ export const getCars = async (req, res) => {
       include: [
         {
           model: Users,
+          as: "CreatedBy",
+          attributes: ["id", "uuid", "name", "email", "role"],
+        },
+        {
+          model: Users,
+          as: "UpdatedBy",
+          attributes: ["id", "uuid", "name", "email", "role"],
+        },
+        {
+          model: Users,
+          as: "DeletedBy",
           attributes: ["id", "uuid", "name", "email", "role"],
         },
       ],
     });
+
+    const response = cars.map((car) => ({
+      id: car.id,
+      uuid: car.uuid,
+      model: car.model,
+      rentPerDay: car.rentPerDay,
+      images: car.images,
+      is_deleted: car.is_deleted,
+      createdBy: car.createdBy,
+      createdByData: car.CreatedBy
+        ? {
+            id: car.CreatedBy.id,
+            uuid: car.CreatedBy.uuid,
+            name: car.CreatedBy.name,
+            email: car.CreatedBy.email,
+            role: car.CreatedBy.role,
+          }
+        : null,
+      updatedBy: car.updatedBy,
+      updatedByData: car.UpdatedBy
+        ? {
+            id: car.UpdatedBy.id,
+            uuid: car.UpdatedBy.uuid,
+            name: car.UpdatedBy.name,
+            email: car.UpdatedBy.email,
+            role: car.UpdatedBy.role,
+          }
+        : null,
+      deletedBy: car.deletedBy,
+      deletedByData: car.DeletedBy
+        ? {
+            id: car.DeletedBy.id,
+            uuid: car.DeletedBy.uuid,
+            name: car.DeletedBy.name,
+            email: car.DeletedBy.email,
+            role: car.DeletedBy.role,
+          }
+        : null,
+      createdAt: car.createdAt,
+      updatedAt: car.updatedAt,
+    }));
 
     res.status(200).json(response);
   } catch (error) {
@@ -57,21 +108,80 @@ export const getCarById = async (req, res) => {
         uuid: req.params.id,
         is_deleted: 0,
       },
-    });
-
-    if (!car) return res.status(404).json({ msg: "Data tidak ditemukan" });
-    let response;
-    response = await Cars.findOne({
-      where: {
-        id: car.id,
-      },
+      attributes: [
+        "id",
+        "uuid",
+        "model",
+        "rentPerDay",
+        "images",
+        "is_deleted",
+        "createdBy",
+        "updatedBy",
+        "deletedBy",
+        "createdAt",
+        "updatedAt",
+      ],
       include: [
         {
           model: Users,
+          as: "CreatedBy",
+          attributes: ["id", "uuid", "name", "email", "role"],
+        },
+        {
+          model: Users,
+          as: "UpdatedBy",
+          attributes: ["id", "uuid", "name", "email", "role"],
+        },
+        {
+          model: Users,
+          as: "DeletedBy",
+          attributes: ["id", "uuid", "name", "email", "role"],
         },
       ],
     });
 
+    if (!car) return res.status(404).json({ msg: "Data tidak ditemukan" });
+
+    const response = {
+      id: car.id,
+      uuid: car.uuid,
+      model: car.model,
+      rentPerDay: car.rentPerDay,
+      images: car.images,
+      is_deleted: car.is_deleted,
+      createdBy: car.createdBy,
+      createdByData: car.CreatedBy
+        ? {
+            id: car.CreatedBy.id,
+            uuid: car.CreatedBy.uuid,
+            name: car.CreatedBy.name,
+            email: car.CreatedBy.email,
+            role: car.CreatedBy.role,
+          }
+        : null,
+      updatedBy: car.updatedBy,
+      updatedByData: car.UpdatedBy
+        ? {
+            id: car.UpdatedBy.id,
+            uuid: car.UpdatedBy.uuid,
+            name: car.UpdatedBy.name,
+            email: car.UpdatedBy.email,
+            role: car.UpdatedBy.role,
+          }
+        : null,
+      deletedBy: car.deletedBy,
+      deletedByData: car.DeletedBy
+        ? {
+            id: car.DeletedBy.id,
+            uuid: car.DeletedBy.uuid,
+            name: car.DeletedBy.name,
+            email: car.DeletedBy.email,
+            role: car.DeletedBy.role,
+          }
+        : null,
+      createdAt: car.createdAt,
+      updatedAt: car.updatedAt,
+    };
     res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ msg: error.message });
@@ -148,14 +258,6 @@ export const deleteCar = async (req, res) => {
         .status(403)
         .json({ msg: "Akses hanya untuk Superadmin & Admin" });
     }
-
-    // Hapus gambar mobil
-    // const imageName = path.basename(car.images);
-    // const imgPath = path.join(__dirname, "../public/uploads", imageName);
-    // console.log("halaman path", imgPath);
-    // if (fs.existsSync(imgPath)) {
-    //   fs.unlinkSync(imgPath);
-    // }
 
     await Cars.update(
       {
