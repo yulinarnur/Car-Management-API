@@ -1,5 +1,5 @@
 import Users from "../models/UserModel.js";
-import argon2 from "argon2";
+import bcrypt from "bcrypt";
 
 export const getUsers = async (req, res) => {
   try {
@@ -29,29 +29,53 @@ export const getUserById = async (req, res) => {
 export const createUser = async (req, res) => {
   const { name, email, password, confPassword, role } = req.body;
 
-  if (password !== confPassword)
+  if (password !== confPassword) {
     return res
       .status(400)
       .json({ msg: "Password dan Confirm Password tidak cocok" });
+  }
 
-  const hashPassword = await argon2.hash(password);
+  const saltRounds = 10;
+  const hashPassword = await bcrypt.hash(password, saltRounds);
+
   try {
-    if (role === "admin" && req.role !== "superadmin") {
-      return res
-        .status(403)
-        .json({ msg: "Anda tidak memiliki akses untuk menambahkan admin" });
-    }
-
-    const newUser = await Users.create({
-      name: name,
-      email: email,
-      password: hashPassword,
-      role: role,
+    let existingUser = await Users.findOne({
+      where: {
+        email: email,
+      },
     });
 
-    res.status(201).json({ msg: "Register Berhasil" });
+    if (existingUser) {
+      return res.status(400).json({ msg: "Email sudah terdaftar" });
+    }
+
+    if (req.role === "superadmin") {
+      const newUser = await Users.create({
+        name: name,
+        email: email,
+        password: hashPassword,
+        role: role,
+      });
+
+      return res.status(201).json({ msg: "Register Berhasil" });
+    } else {
+      if (role !== "member") {
+        return res
+          .status(403)
+          .json({ msg: "Anda tidak memiliki akses untuk menambahkan admin" });
+      }
+
+      const newUser = await Users.create({
+        name: name,
+        email: email,
+        password: hashPassword,
+        role: "member",
+      });
+
+      return res.status(201).json({ msg: "Register Berhasil" });
+    }
   } catch (error) {
-    res.status(400).json({ msg: error.message });
+    return res.status(400).json({ msg: error.message });
   }
 };
 
@@ -67,7 +91,7 @@ export const updateUser = async (req, res) => {
   if (password === "" || password === null) {
     hashPassword = user.password;
   } else {
-    hashPassword = await argon2.hash(password);
+    hashPassword = await bcrypt.hash(password, 10);
   }
   if (password !== confPassword)
     return res

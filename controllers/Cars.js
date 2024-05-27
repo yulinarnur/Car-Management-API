@@ -92,7 +92,6 @@ export const createCar = async (req, res) => {
     res.status(201).json({ msg: "Car Created Successfuly" });
   } catch (error) {
     res.status(500).json({ msg: error.message });
-    console.log("apaaa yaa", error);
   }
 };
 

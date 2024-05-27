@@ -1,5 +1,5 @@
 import Users from "../models/UserModel.js";
-import argon2 from "argon2";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export const Login = async (req, res) => {
@@ -9,7 +9,7 @@ export const Login = async (req, res) => {
     },
   });
   if (!user) return res.status(404).json({ msg: "Email tidak ditemukan" });
-  const match = await argon2.verify(user.password, req.body.password);
+  const match = await bcrypt.compare(req.body.password, user.password);
   if (!match) return res.status(400).json({ msg: "Wrong Password" });
   req.session.userId = user.uuid;
   const uuid = user.uuid;
@@ -70,12 +70,9 @@ export const logOut = async (req, res) => {
     },
   });
 
-  // Cek apakah user ditemukan
   if (users.length === 0) return res.sendStatus(204);
 
   const userId = users[0].id;
-  // console.log(users);
-
   await Users.update(
     { refresh_token: null },
     {
@@ -87,8 +84,4 @@ export const logOut = async (req, res) => {
 
   res.clearCookie("refreshToken");
   return res.sendStatus(200);
-  // req.session.destroy((err) => {
-  //   if (err) return res.status(400).json({ msg: "Tidak dapat logout" });
-  //   res.status(200).json({ msg: "Anda telah logout" });
-  // });
 };
