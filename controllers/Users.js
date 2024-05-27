@@ -28,41 +28,30 @@ export const getUserById = async (req, res) => {
 
 export const createUser = async (req, res) => {
   const { name, email, password, confPassword, role } = req.body;
+
   if (password !== confPassword)
     return res
       .status(400)
       .json({ msg: "Password dan Confirm Password tidak cocok" });
+
   const hashPassword = await argon2.hash(password);
-  if (role === "admin") {
-    if (req.role === "superadmin") {
-      try {
-        await Users.create({
-          name: name,
-          email: email,
-          password: hashPassword,
-          role: role,
-        });
-        res.status(201).json({ msg: "Register Berhasil" });
-      } catch (error) {
-        res.status(400).json({ msg: error.message });
-      }
-    } else {
-      res.status(400).json({ msg: "Anda tidak memiliki akses" });
+  try {
+    if (role === "admin" && req.role !== "superadmin") {
+      return res
+        .status(403)
+        .json({ msg: "Anda tidak memiliki akses untuk menambahkan admin" });
     }
-  } else if (role === "superadmin") {
-    res.status(400).json({ msg: "Anda tidak memiliki akses" });
-  } else {
-    try {
-      await Users.create({
-        name: name,
-        email: email,
-        password: hashPassword,
-        role: role,
-      });
-      res.status(201).json({ msg: "Register Berhasil" });
-    } catch (error) {
-      res.status(400).json({ msg: error.message });
-    }
+
+    const newUser = await Users.create({
+      name: name,
+      email: email,
+      password: hashPassword,
+      role: role,
+    });
+
+    res.status(201).json({ msg: "Register Berhasil" });
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
   }
 };
 

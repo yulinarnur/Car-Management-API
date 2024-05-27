@@ -39,15 +39,7 @@ export const getCars = async (req, res) => {
       include: [
         {
           model: Users,
-          attributes: [
-            "id",
-            "uuid",
-            "name",
-            "email",
-            "role",
-            "createdAt",
-            "updatedAt",
-          ],
+          attributes: ["id", "uuid", "name", "email", "role"],
         },
       ],
     });
