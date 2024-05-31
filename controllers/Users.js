@@ -60,9 +60,7 @@ export const createUser = async (req, res) => {
       return res.status(201).json({ msg: "Register Berhasil" });
     } else {
       if (role !== "member") {
-        return res
-          .status(403)
-          .json({ msg: "Anda tidak memiliki akses untuk menambahkan admin" });
+        return res.status(403).json({ msg: "Anda tidak memiliki akses" });
       }
 
       const newUser = await Users.create({
@@ -166,9 +164,7 @@ export const createUserNonMember = async (req, res) => {
       });
       return res.status(201).json({ msg: "Register Berhasil" });
     } else {
-      return res
-        .status(403)
-        .json({ msg: "Anda tidak memiliki akses untuk menambahkan admin" });
+      return res.status(403).json({ msg: "Anda tidak memiliki akses" });
     }
   } catch (error) {
     return res.status(400).json({ msg: error.message });
