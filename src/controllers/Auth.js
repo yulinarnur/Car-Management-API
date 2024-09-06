@@ -1,50 +1,21 @@
 import Users from "../models/UserModel.js";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import { loginService } from "../service/authService.js";
+import { sendResponse } from "../utils/responseUtils.js";
 
 export const Login = async (req, res) => {
-  const user = await Users.findOne({
-    where: {
-      email: req.body.email,
-    },
-  });
-  if (!user) return res.status(404).json({ msg: "Email tidak ditemukan" });
-  const match = await bcrypt.compare(req.body.password, user.password);
-  if (!match) return res.status(400).json({ msg: "Wrong Password" });
-  req.session.userId = user.uuid;
-  const uuid = user.uuid;
-  const name = user.name;
-  const email = user.email;
-  const role = user.role;
-  const accessToken = jwt.sign(
-    { uuid, name, email, role },
-    process.env.ACCESS_TOKEN_SECRET,
-    {
-      expiresIn: "40s",
+    try {
+        const result = await loginService(req.body);
+
+        if (result.error) {
+            return sendResponse(res, result.status, result.message, false, null);
+        }
+
+        return sendResponse(res, 200, 'Login success', true, result.data);
+    } catch (error) {
+        console.error('Error:', error);
+        return sendResponse(res, 500, 'Internal server error', false, { error: error.message });
     }
-  );
-  const refreshToken = jwt.sign(
-    { uuid, name, email, role },
-    process.env.REFRESH_TOKEN_SECRET,
-    {
-      expiresIn: "1d",
-    }
-  );
-  await Users.update(
-    { refresh_token: refreshToken },
-    {
-      where: {
-        uuid: uuid,
-      },
-    }
-  );
-  res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000,
-  });
-  res.json({ accessToken });
-  // res.status(200).json({ uuid, name, email, role });
-};
+}
 
 export const Me = async (req, res) => {
   if (!req.session.userId) {
