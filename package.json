@@ -2,10 +2,10 @@
   "name": "carAuth",
   "version": "1.0.0",
   "type": "module",
-  "main": "src/index.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",  
-    "dev": "nodemon src/index.js"
+    "sequelize:init": "sequelize-cli init",
+    "sequelize:migrate": "sequelize-cli db:migrate"
   },
   "license": "MIT",
   "dependencies": {
@@ -21,7 +21,9 @@
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.9.7",
     "nodemon": "^3.1.0",
-    "sequelize": "^6.37.3",
+    "sequelize": "^6.37.3"
+  },
+  "devDependencies": {
     "sequelize-cli": "^6.6.2"
   }
 }
